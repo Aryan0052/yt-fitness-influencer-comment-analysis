@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "FitScope YouTube Sentiment Analyzer",
+  "description": "Fetch YouTube comments by video ID and analyze fitness comment sentiment with your local API.",
+  "version": "1.0.0",
+  "permissions": ["storage", "tabs", "activeTab"],
+  "host_permissions": [
+    "http://127.0.0.1:8000/*",
+    "http://localhost:8000/*",
+    "https://www.youtube.com/*",
+    "https://youtube.com/*",
+    "https://youtu.be/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "FitScope Analyzer",
+    "default_popup": "popup.html"
+  }
+}

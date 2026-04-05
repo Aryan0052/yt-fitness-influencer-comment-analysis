@@ -1,0 +1,16 @@
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+jupyter
+joblib
+streamlit
+fastapi
+uvicorn
+requests
+python-multipart
+optuna
+transformers
+torch
+accelerate

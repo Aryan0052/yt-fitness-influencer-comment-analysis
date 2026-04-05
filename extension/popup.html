@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FitScope Analyzer</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="hero-top">
+          <div>
+            <p class="eyebrow">FitScope Intelligence</p>
+            <h1>Comment Sentiment Radar</h1>
+          </div>
+          <div class="hero-orb"></div>
+        </div>
+        <p class="subcopy">A compact YouTube analytics console powered by your best trained sentiment model, live comment fetches, and instant audience diagnostics.</p>
+        <div class="hero-strip">
+          <span class="hero-chip">YouTube API</span>
+          <span class="hero-chip">Best Model Loaded</span>
+          <span class="hero-chip">Live Comment Analytics</span>
+        </div>
+        <div id="activeModelBanner" class="model-banner hidden">
+          <div class="model-banner-title">Active Model</div>
+          <div id="activeModelName" class="model-banner-name"></div>
+          <div class="model-metric-row">
+            <div class="model-metric">
+              <span class="model-metric-label">Macro F1</span>
+              <span id="activeModelF1" class="model-metric-value">-</span>
+            </div>
+            <div class="model-metric">
+              <span class="model-metric-label">Macro Recall</span>
+              <span id="activeModelRecall" class="model-metric-value">-</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel form-panel">
+        <div class="section-head">
+          <h2>Control Center</h2>
+          <span class="badge">Live Session</span>
+        </div>
+        <label>
+          <span>Backend URL</span>
+          <input id="backendUrl" type="text" value="http://127.0.0.1:8000" />
+        </label>
+        <label>
+          <span>YouTube API Key</span>
+          <input id="apiKey" type="password" placeholder="AIza..." />
+        </label>
+        <label>
+          <span>Detected YouTube Video ID</span>
+          <input id="videoId" type="text" placeholder="Open a YouTube video tab" readonly />
+        </label>
+        <label>
+          <span>Detected Page</span>
+          <input id="detectedPage" type="text" placeholder="Open a YouTube watch page" readonly />
+        </label>
+        <label>
+          <span>Comments to Analyze</span>
+          <input id="maxComments" type="number" min="10" max="200" value="80" />
+        </label>
+        <button id="analyzeButton">Analyze Current Video</button>
+        <p id="status" class="status">Waiting for input.</p>
+        <div class="action-row">
+          <button id="exportCsvButton" class="secondary-button" type="button">Export CSV</button>
+          <button id="exportReportButton" class="secondary-button" type="button">Export Report</button>
+        </div>
+      </section>
+
+      <section id="summaryPanel" class="panel hidden">
+        <h2>Video Summary</h2>
+        <div id="videoMeta" class="meta-grid"></div>
+      </section>
+
+      <section id="sentimentPanel" class="panel hidden">
+        <div class="section-head">
+          <h2>Sentiment Breakdown</h2>
+          <span id="analysisBadge" class="badge strong-badge"></span>
+        </div>
+        <div class="analytics-layout">
+          <div class="donut-shell">
+            <div id="sentimentDonut" class="donut-chart">
+              <div class="donut-core">
+                <span id="donutTotal" class="donut-total">0</span>
+                <span class="donut-caption">comments</span>
+              </div>
+            </div>
+          </div>
+          <div class="analytics-side">
+            <div id="countCards" class="count-grid"></div>
+            <div id="chartBars" class="chart-bars"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="leaderboardPanel" class="panel hidden">
+        <div class="section-head">
+          <h2>Loaded Best Model</h2>
+          <span id="modelBadge" class="badge"></span>
+        </div>
+        <div id="modelSummary" class="meta-grid"></div>
+        <div class="subsection-title" style="margin-top:14px;">Top Model Leaderboard</div>
+        <div id="leaderboardList" class="stack-list"></div>
+      </section>
+
+      <section id="wordCloudPanel" class="panel hidden">
+        <div class="section-head">
+          <h2>Word Cloud Terms</h2>
+          <select id="cloudFilter">
+            <option value="overall">Overall</option>
+            <option value="positive">Positive</option>
+            <option value="neutral">Neutral</option>
+            <option value="negative">Negative</option>
+          </select>
+        </div>
+        <div id="wordCloud" class="word-cloud"></div>
+      </section>
+
+      <section id="insightPanel" class="panel hidden">
+        <div class="section-head">
+          <h2>Quick Insights</h2>
+          <span class="badge">Portfolio View</span>
+        </div>
+        <div id="insightCards" class="insight-grid"></div>
+        <div class="confidence-panel">
+          <div class="subsection-title">Prediction Confidence</div>
+          <div id="confidenceBars" class="chart-bars"></div>
+        </div>
+      </section>
+
+      <section id="engagementPanel" class="panel hidden">
+        <div class="section-head">
+          <h2>Engagement Analytics</h2>
+          <span class="badge">Likes + Volume</span>
+        </div>
+        <div class="two-column-grid">
+          <div>
+            <div class="subsection-title">Average Likes by Sentiment</div>
+            <div id="engagementBars" class="chart-bars"></div>
+          </div>
+          <div>
+            <div class="subsection-title">Comment Length Mix</div>
+            <div id="lengthBars" class="chart-bars"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="audiencePanel" class="panel hidden">
+        <div class="section-head">
+          <h2>Audience Signals</h2>
+          <span class="badge">Top Participants</span>
+        </div>
+        <div class="two-column-grid">
+          <div>
+            <div class="subsection-title">Top Comment Authors</div>
+            <div id="authorList" class="stack-list"></div>
+          </div>
+          <div>
+            <div class="subsection-title">Most Repeated Terms</div>
+            <div id="termList" class="stack-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="timelinePanel" class="panel hidden">
+        <div class="section-head">
+          <h2>Confidence Timeline</h2>
+          <span class="badge">Prediction Flow</span>
+        </div>
+        <div id="timelineChart" class="timeline-chart"></div>
+      </section>
+
+      <section id="commentsPanel" class="panel hidden">
+        <div class="section-head">
+          <h2>Predicted Comments</h2>
+          <span id="commentCountBadge" class="badge"></span>
+        </div>
+        <div class="comment-toolbar">
+          <select id="commentFilter">
+            <option value="all">All sentiments</option>
+            <option value="positive">Positive only</option>
+            <option value="neutral">Neutral only</option>
+            <option value="negative">Negative only</option>
+          </select>
+          <input id="commentSearch" type="text" placeholder="Search comments or authors" />
+        </div>
+        <div id="commentList" class="comment-list"></div>
+      </section>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
