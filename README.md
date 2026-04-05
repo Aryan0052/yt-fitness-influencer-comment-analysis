@@ -108,6 +108,75 @@ Optional: launch the local Streamlit dashboard:
 streamlit run app.py
 ```
 
+## Deploy The API
+
+The easiest production setup for this project is:
+
+- deploy the FastAPI backend
+- keep the Chrome extension as the frontend
+- paste the deployed backend URL into the extension popup
+
+This repository now includes:
+
+- `Dockerfile`
+- `.dockerignore`
+- `requirements-api.txt`
+- `render.yaml`
+
+These files are meant for hosting the API on a Docker-friendly service such as Render.
+
+### Deploy on Render
+
+1. Push this repository to GitHub.
+2. Open Render and create a new `Web Service`.
+3. Connect your GitHub repository:
+   - `yt-fitness-influencer-comment-analysis`
+4. Render will detect the included `Dockerfile`.
+5. Deploy the service.
+6. After deployment, copy your public backend URL.
+
+Example deployed URL:
+
+```text
+https://yt-fitness-influencer-comment-analysis-api.onrender.com
+```
+
+Test the deployed API:
+
+- `/`
+- `/health`
+- `/docs`
+- `/model/summary`
+
+Example:
+
+```text
+https://your-service-name.onrender.com/health
+```
+
+### Use The Deployed API In The Chrome Extension
+
+After your backend is live:
+
+1. Open the Chrome extension popup.
+2. Set `Backend URL` to your deployed API URL.
+3. Paste your YouTube Data API key.
+4. Open a YouTube video tab.
+5. Run analysis.
+
+The extension will then:
+
+- fetch comments for the current video
+- send them to the deployed model API
+- show sentiment charts, top terms, and comment-level predictions
+
+### Important Deployment Notes
+
+- The deployed API uses the saved `SGD Classifier (Calibrated, Optuna Tuned)` model.
+- The popup summary still works even if training metric files are not present on the host.
+- DistilBERT checkpoints are intentionally excluded from deployment because they are too large for a lightweight first deploy.
+- Your YouTube API key is not stored in the repository. Enter it only in the extension popup.
+
 ## Chrome Extension Workflow
 
 1. Open `chrome://extensions/`

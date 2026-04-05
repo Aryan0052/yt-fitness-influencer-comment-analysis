@@ -1,0 +1,10 @@
+.git
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+env/
+
+notebooks/
+outputs/models/distilbert_sentiment/
+outputs/metrics/
